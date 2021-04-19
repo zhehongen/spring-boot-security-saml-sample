@@ -11,3 +11,5 @@ keytool -delete -alias ssocircle -keystore $KEYSTORE_FILE -storepass $KEYSTORE_P
 keytool -import -alias ssocircle -file $CERTIFICATE_FILE -keystore $KEYSTORE_FILE -storepass $KEYSTORE_PASSWORD -noprompt
 
 rm $CERTIFICATE_FILE
+
+#update-certificate.sh解释：从IDP_HOST、IDP_PORT的地址获取证书存入临时ssocircle.cert中，根据ssocircle.cert生成samlKeystore.jks文件。

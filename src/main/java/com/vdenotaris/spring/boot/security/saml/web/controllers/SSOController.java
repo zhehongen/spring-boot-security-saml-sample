@@ -41,7 +41,7 @@ public class SSOController {
 
     @Autowired
     private MetadataManager metadata;
-
+    //服务发现
     @RequestMapping(value = "/discovery", method = RequestMethod.GET)
     public String idpSelection(HttpServletRequest request, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

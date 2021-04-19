@@ -20,7 +20,7 @@ import com.vdenotaris.spring.boot.security.saml.web.core.SAMLUserDetailsServiceI
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
-import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
+import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.opensaml.xml.parse.ParserPool;
@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,7 +41,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.saml.*;
-import org.springframework.security.saml.context.SAMLContextProviderImpl;
+import org.springframework.security.saml.context.SAMLContextProviderLB;
 import org.springframework.security.saml.key.JKSKeyManager;
 import org.springframework.security.saml.key.KeyManager;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
@@ -62,6 +63,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.io.IOException;
 import java.util.*;
 
 @Configuration
@@ -86,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     @Autowired
     private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
 
-    // Initialization of the velocity engine
+    // Initialization of the velocity engine速度
     @Bean
     public VelocityEngine velocityEngine() {
         return VelocityFactory.getEngine();
@@ -120,9 +122,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     }
 
     // Provider of default SAML Context
+//    @Bean
+//    public SAMLContextProviderImpl contextProvider() {
+//        return new SAMLContextProviderImpl();
+//    }
     @Bean
-    public SAMLContextProviderImpl contextProvider() {
-        return new SAMLContextProviderImpl();
+    public SAMLContextProviderLB contextProvider() {
+        SAMLContextProviderLB samlContextProviderLB = new SAMLContextProviderLB();
+        samlContextProviderLB.setScheme("https");
+        samlContextProviderLB.setServerName("happy-otter-97.loca.lt");
+        samlContextProviderLB.setContextPath("/");
+        return samlContextProviderLB;
     }
 
     // Initialization of OpenSAML library
@@ -209,6 +219,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         extendedMetadata.setSigningAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         extendedMetadata.setSignMetadata(true);
         extendedMetadata.setEcpEnabled(true);
+        //extendedMetadata.setAlias("zhanghongentest");
         return extendedMetadata;
     }
 
@@ -220,39 +231,58 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         return idpDiscovery;
     }
 
+//    @Bean
+//    @Qualifier("idp-ssocircle")
+//    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider()
+//            throws MetadataProviderException {
+//        String idpSSOCircleMetadataURL = "https://dev-2964091.okta.com/app/exkk7rbnoAHc2Ebwo5d6/sso/saml/metadata"; //   "https://idp.ssocircle.com/meta-idp.xml";//在线元数据地址
+//        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
+//                this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
+//        httpMetadataProvider.setParserPool(parserPool());
+//        ExtendedMetadataDelegate extendedMetadataDelegate =
+//                new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
+//        extendedMetadataDelegate.setMetadataTrustCheck(true);
+//        extendedMetadataDelegate.setMetadataRequireSignature(false);
+//        backgroundTaskTimer.purge();
+//        return extendedMetadataDelegate;
+//    }
+
     @Bean
-    @Qualifier("idp-ssocircle")
-    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider()
-            throws MetadataProviderException {
-        String idpSSOCircleMetadataURL = "https://idp.ssocircle.com/meta-idp.xml";
-        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
-                this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
-        httpMetadataProvider.setParserPool(parserPool());
+    @Qualifier("idp-ssoGSuite")
+    public ExtendedMetadataDelegate ssoGSuiteExtendedMetadataProvider()
+            throws MetadataProviderException, IOException {
+        ClassPathResource meta = new ClassPathResource("GoogleIDPMetadata.xml");
+        FilesystemMetadataProvider filesystemMetadataProvider = new FilesystemMetadataProvider(this.backgroundTaskTimer, meta.getFile());
+        filesystemMetadataProvider.setParserPool(parserPool());
         ExtendedMetadataDelegate extendedMetadataDelegate =
-                new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
+                new ExtendedMetadataDelegate(filesystemMetadataProvider, extendedMetadata());//看过了 用三个参数的构造函数吧
         extendedMetadataDelegate.setMetadataTrustCheck(true);
         extendedMetadataDelegate.setMetadataRequireSignature(false);
+
         backgroundTaskTimer.purge();
         return extendedMetadataDelegate;
     }
 
+
     // IDP Metadata configuration - paths to metadata of IDPs in circle of trust
-    // is here
-    // Do no forget to call iniitalize method on providers
+    // is here IDP元数据配置-此处以信任圈的形式指向IDP元数据的路径。不要忘记在提供程序上调用initialize方法
+    // Do no forget to call initialize method on providers
     @Bean
     @Qualifier("metadata")
-    public CachingMetadataManager metadata() throws MetadataProviderException {
+    public CachingMetadataManager metadata() throws MetadataProviderException, IOException {
         List<MetadataProvider> providers = new ArrayList<MetadataProvider>();
-        providers.add(ssoCircleExtendedMetadataProvider());
+        providers.add(ssoGSuiteExtendedMetadataProvider());
+        //providers.add(ssoCircleExtendedMetadataProvider());
         return new CachingMetadataManager(providers);
     }
 
-    // Filter automatically generates default SP metadata
+    // Filter automatically generates default SP metadata产生sp元数据
     @Bean
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
         metadataGenerator.setEntityId("com:vdenotaris:spring:sp");
         metadataGenerator.setExtendedMetadata(extendedMetadata());
+        metadataGenerator.setEntityBaseURL("https://happy-otter-97.loca.lt");
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());
         return metadataGenerator;
@@ -469,8 +499,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .authenticationProvider(samlAuthenticationProvider());
+        auth.authenticationProvider(samlAuthenticationProvider());
     }
 
     @Override

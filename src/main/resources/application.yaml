@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  forward-headers-strategy: native
+
+spring:
+  application:
+    name: saml-test
+logging:
+  file.max-size: 1024MB
+  level:
+    com.vdenotaris.spring.boot.security.saml: DEBUG
+    org.opensaml: DEBUG
+    org.springframework.security.saml: trace
+    org.springframework.security: debug
+  register-shutdown-hook: false
+  pattern:
+    console: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%file : %line] - %msg%n'
+  file:
+    name: /applogs/backend/${spring.application.name}.log
+
+
+
+
