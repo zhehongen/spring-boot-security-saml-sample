@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.vdenotaris.spring</groupId>
     <artifactId>spring-boot-security-saml-sample</artifactId>
@@ -68,6 +69,10 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -118,7 +123,8 @@
     <scm>
         <connection>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</connection>
         <url>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</url>
-        <developerConnection>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:vdenotaris/spring-boot-security-saml-sample.git
+        </developerConnection>
     </scm>
     <build>
         <plugins>
@@ -147,4 +153,10 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>localtmx</id>
+            <url>http://47.112.242.228:8182/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
 </project>

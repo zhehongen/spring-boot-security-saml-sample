@@ -17,7 +17,8 @@ logging:
     console: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} [%file : %line] - %msg%n'
   file:
     name: /applogs/backend/${spring.application.name}.log
-
+zhe:
+  hostname: 60a3857557a6.ngrok.io
 
 
 

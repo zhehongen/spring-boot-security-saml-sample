@@ -44,6 +44,9 @@ public class SSOController {
     //服务发现
     @RequestMapping(value = "/discovery", method = RequestMethod.GET)
     public String idpSelection(HttpServletRequest request, Model model) {
+
+        //metadata.addMetadataProvider();不错
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null)
             LOG.debug("Current authentication instance from security context is null");

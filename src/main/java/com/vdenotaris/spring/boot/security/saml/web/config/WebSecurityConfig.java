@@ -21,6 +21,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
 import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
+import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.opensaml.xml.parse.ParserPool;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -70,6 +72,10 @@ import java.util.*;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements InitializingBean, DisposableBean {
+
+    @Value("${zhe.hostname}")
+    private String hostname;
+//说明：先把元数据区分清楚。先定义一个数据库元数据提供者。再定义一个接口。不断添加元数据提供器。
 
     private Timer backgroundTaskTimer;
     private MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager;
@@ -130,7 +136,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public SAMLContextProviderLB contextProvider() {
         SAMLContextProviderLB samlContextProviderLB = new SAMLContextProviderLB();
         samlContextProviderLB.setScheme("https");
-        samlContextProviderLB.setServerName("happy-otter-97.loca.lt");
+        samlContextProviderLB.setServerName(hostname);
         samlContextProviderLB.setContextPath("/");
         return samlContextProviderLB;
     }
@@ -212,14 +218,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     }
 
     // Setup advanced info about metadata
-    @Bean
+    //@Bean 不用暴露bean
     public ExtendedMetadata extendedMetadata() {
         ExtendedMetadata extendedMetadata = new ExtendedMetadata();
         extendedMetadata.setIdpDiscoveryEnabled(true);
-        extendedMetadata.setSigningAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        extendedMetadata.setSigningAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");//说明：签名算法
         extendedMetadata.setSignMetadata(true);
         extendedMetadata.setEcpEnabled(true);
-        //extendedMetadata.setAlias("zhanghongentest");
+        extendedMetadata.setAlias("testSaml");
         return extendedMetadata;
     }
 
@@ -231,21 +237,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         return idpDiscovery;
     }
 
-//    @Bean
-//    @Qualifier("idp-ssocircle")
-//    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider()
-//            throws MetadataProviderException {
-//        String idpSSOCircleMetadataURL = "https://dev-2964091.okta.com/app/exkk7rbnoAHc2Ebwo5d6/sso/saml/metadata"; //   "https://idp.ssocircle.com/meta-idp.xml";//在线元数据地址
-//        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
-//                this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
-//        httpMetadataProvider.setParserPool(parserPool());
-//        ExtendedMetadataDelegate extendedMetadataDelegate =
-//                new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
-//        extendedMetadataDelegate.setMetadataTrustCheck(true);
-//        extendedMetadataDelegate.setMetadataRequireSignature(false);
-//        backgroundTaskTimer.purge();
-//        return extendedMetadataDelegate;
-//    }
+    @Bean
+    @Qualifier("idp-ssocircle")
+    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider()
+            throws MetadataProviderException {
+        String idpSSOCircleMetadataURL = "https://dev-2964091.okta.com/app/exkk7rbnoAHc2Ebwo5d6/sso/saml/metadata"; //   "https://idp.ssocircle.com/meta-idp.xml";//在线元数据地址
+        HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
+                this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
+        httpMetadataProvider.setParserPool(parserPool());
+        ExtendedMetadataDelegate extendedMetadataDelegate =
+                new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
+        extendedMetadataDelegate.setMetadataTrustCheck(true);
+        extendedMetadataDelegate.setMetadataRequireSignature(false);
+        backgroundTaskTimer.purge();
+        return extendedMetadataDelegate;
+    }
 
     @Bean
     @Qualifier("idp-ssoGSuite")
@@ -272,17 +278,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public CachingMetadataManager metadata() throws MetadataProviderException, IOException {
         List<MetadataProvider> providers = new ArrayList<MetadataProvider>();
         providers.add(ssoGSuiteExtendedMetadataProvider());
-        //providers.add(ssoCircleExtendedMetadataProvider());
+        providers.add(ssoCircleExtendedMetadataProvider());
         return new CachingMetadataManager(providers);
     }
 
     // Filter automatically generates default SP metadata产生sp元数据
     @Bean
-    public MetadataGenerator metadataGenerator() {
-        MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId("com:vdenotaris:spring:sp");
+    public MetadataGenerator metadataGenerator() {//说明：从数据库填充，应该不用暴露bean
+        MetadataGenerator metadataGenerator = new CustomMetadataGenerator();//说明: 自定义的
+        metadataGenerator.setEntityId("com:vdenotaris:spring:sp");//直接写死不太好吧
         metadataGenerator.setExtendedMetadata(extendedMetadata());
-        metadataGenerator.setEntityBaseURL("https://happy-otter-97.loca.lt");
+        metadataGenerator.setEntityBaseURL("https://" + hostname);
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());
         return metadataGenerator;
@@ -503,7 +509,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         init();
     }
 
