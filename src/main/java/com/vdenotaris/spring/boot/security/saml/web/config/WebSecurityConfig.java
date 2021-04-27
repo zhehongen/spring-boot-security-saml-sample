@@ -75,8 +75,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 
     @Value("${zhe.hostname}")
     private String hostname;
-//说明：先把元数据区分清楚。先定义一个数据库元数据提供者。再定义一个接口。不断添加元数据提供器。
-
+//说明：先把元数据区分清楚。先定义一个数据库元数据提供者。再定义一个接口。不断添加元数据提供器。已实现
+//多节点数据怎么热更新怎么办？redis广播？先删除再新增？删哪一个？ExtendedMetadataDelegate里面设置一个特殊值用来进行查找
+//如何根据sp自动找到idp?禁用idp发现功能。根据公司域名找到sp，根据sp找到alias，
+//sp元数据似乎不用存储。每次程序启动扫描数据库，载入内存。先实现一个生成sp元数据的接口
+//sp的alias和ipd的alias能一样吗？ipd需要alias吗？idp要扩展元数据干啥？
     private Timer backgroundTaskTimer;
     private MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager;
 
@@ -253,21 +256,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         return extendedMetadataDelegate;
     }
 
-    @Bean
-    @Qualifier("idp-ssoGSuite")
-    public ExtendedMetadataDelegate ssoGSuiteExtendedMetadataProvider()
-            throws MetadataProviderException, IOException {
-        ClassPathResource meta = new ClassPathResource("GoogleIDPMetadata.xml");
-        FilesystemMetadataProvider filesystemMetadataProvider = new FilesystemMetadataProvider(this.backgroundTaskTimer, meta.getFile());
-        filesystemMetadataProvider.setParserPool(parserPool());
-        ExtendedMetadataDelegate extendedMetadataDelegate =
-                new ExtendedMetadataDelegate(filesystemMetadataProvider, extendedMetadata());//看过了 用三个参数的构造函数吧
-        extendedMetadataDelegate.setMetadataTrustCheck(true);
-        extendedMetadataDelegate.setMetadataRequireSignature(false);
-
-        backgroundTaskTimer.purge();
-        return extendedMetadataDelegate;
-    }
+//    @Bean
+//    @Qualifier("idp-ssoGSuite")
+//    public ExtendedMetadataDelegate ssoGSuiteExtendedMetadataProvider()
+//            throws MetadataProviderException, IOException {
+//        ClassPathResource meta = new ClassPathResource("GoogleIDPMetadata.xml");
+//        FilesystemMetadataProvider filesystemMetadataProvider = new FilesystemMetadataProvider(this.backgroundTaskTimer, meta.getFile());
+//        filesystemMetadataProvider.setParserPool(parserPool());
+//        ExtendedMetadataDelegate extendedMetadataDelegate =
+//                new ExtendedMetadataDelegate(filesystemMetadataProvider, extendedMetadata());//看过了 用三个参数的构造函数吧
+//        extendedMetadataDelegate.setMetadataTrustCheck(true);
+//        extendedMetadataDelegate.setMetadataRequireSignature(false);
+//
+//        backgroundTaskTimer.purge();
+//        return extendedMetadataDelegate;
+//    }
 
 
     // IDP Metadata configuration - paths to metadata of IDPs in circle of trust
@@ -277,13 +280,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     @Qualifier("metadata")
     public CachingMetadataManager metadata() throws MetadataProviderException, IOException {
         List<MetadataProvider> providers = new ArrayList<MetadataProvider>();
-        providers.add(ssoGSuiteExtendedMetadataProvider());
+        //providers.add(ssoGSuiteExtendedMetadataProvider());
         providers.add(ssoCircleExtendedMetadataProvider());
         return new CachingMetadataManager(providers);
     }
 
     // Filter automatically generates default SP metadata产生sp元数据
-    @Bean
+    //@Bean 需要bean
     public MetadataGenerator metadataGenerator() {//说明：从数据库填充，应该不用暴露bean
         MetadataGenerator metadataGenerator = new CustomMetadataGenerator();//说明: 自定义的
         metadataGenerator.setEntityId("com:vdenotaris:spring:sp");//直接写死不太好吧
@@ -490,7 +493,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
                 .antMatchers("/saml/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/img/**").permitAll()
-                .antMatchers("/js/**").permitAll()
+                .antMatchers("/js/**","/favicon.ico").permitAll()
                 .anyRequest().authenticated();
         http
                 .logout()
