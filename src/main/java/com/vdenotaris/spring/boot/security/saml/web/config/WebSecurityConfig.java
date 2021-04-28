@@ -20,7 +20,6 @@ import com.vdenotaris.spring.boot.security.saml.web.core.SAMLUserDetailsServiceI
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
-import org.opensaml.saml2.metadata.provider.FilesystemMetadataProvider;
 import org.opensaml.saml2.metadata.provider.HTTPMetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
@@ -33,13 +32,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.saml.*;
@@ -72,14 +71,14 @@ import java.util.*;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements InitializingBean, DisposableBean {
-
+    //说明：ipd和sp的信息程序启动的时候都需要加载入内存。就用公司code作为alias。
     @Value("${zhe.hostname}")
     private String hostname;
-//说明：先把元数据区分清楚。先定义一个数据库元数据提供者。再定义一个接口。不断添加元数据提供器。已实现
+    //说明：先把元数据区分清楚。先定义一个数据库元数据提供者。再定义一个接口。不断添加元数据提供器。已实现
 //多节点数据怎么热更新怎么办？redis广播？先删除再新增？删哪一个？ExtendedMetadataDelegate里面设置一个特殊值用来进行查找
-//如何根据sp自动找到idp?禁用idp发现功能。根据公司域名找到sp，根据sp找到alias，
-//sp元数据似乎不用存储。每次程序启动扫描数据库，载入内存。先实现一个生成sp元数据的接口
-//sp的alias和ipd的alias能一样吗？ipd需要alias吗？idp要扩展元数据干啥？
+//如何根据sp自动找到idp?禁用idp发现功能。根据公司域名找到公司，进而找到sp的alias就是companyCode，根据sp找到alias，
+//sp元数据似乎不用存储。每次程序启动扫描数据库，载入内存。先实现一个生成sp元数据的接口。
+//sp的alias和ipd的alias能一样吗？不能。ipd需要alias吗？需要一个特殊值和sp进行关联。idp要extend元数据干啥？
     private Timer backgroundTaskTimer;
     private MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager;
 
@@ -493,7 +492,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
                 .antMatchers("/saml/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/img/**").permitAll()
-                .antMatchers("/js/**","/favicon.ico").permitAll()
+                .antMatchers("/js/**", "/favicon.ico").permitAll()
                 .anyRequest().authenticated();
         http
                 .logout()
@@ -521,4 +520,41 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         shutdown();
     }
 
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(SKIP_MATCHERS);
+    }
+
+
+    private final static String[] SKIP_MATCHERS = new String[]{
+            "/",
+            "/csrf",
+            "/error",
+            "/csrf",
+            "/account/**",
+            "/RMA-template.xlsx",
+            "/RMA-template.csv",
+            "/RMA-OutboundList-template.xlsx",
+            "/RMA-OutboundList-template.csv",
+            "swagger-ui.html",
+            "**/swagger-ui.html",
+            "/favicon.ico",
+            "/**/*.css",
+            "/**/*.js",
+            "/**/*.png",
+            "/**/*.gif",
+            "/swagger-resources/**",
+            "/v2/**",
+            "/**/*.ttf",
+            "/webjars/**",
+            "/v2/api-docs",
+            "/swagger-resources/configuration/ui",
+            "/swagger-resources",
+            "/swagger-resources/configuration/security",
+            "/swagger-ui.html",
+            "/channel/**",
+            "/oauth/token",
+            "/oauth/listen",
+    };
 }

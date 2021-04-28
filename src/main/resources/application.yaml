@@ -5,6 +5,21 @@ server:
 spring:
   application:
     name: saml-test
+  datasource:
+    url: jdbc:mysql://localhost:3306/io_saml?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: thingsmatrix@8
+    initialization-mode: always
+  jpa:
+    database: mysql
+    database-platform: com.vdenotaris.spring.boot.security.saml.web.config.MySQL5Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
 logging:
   file.max-size: 1024MB
   level:
