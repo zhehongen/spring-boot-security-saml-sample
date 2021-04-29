@@ -33,7 +33,7 @@ logging:
   file:
     name: /applogs/backend/${spring.application.name}.log
 zhe:
-  hostname: 91924d1188c2.ngrok.io
+  hostname: 177321ce2819.ngrok.io
 
 
 

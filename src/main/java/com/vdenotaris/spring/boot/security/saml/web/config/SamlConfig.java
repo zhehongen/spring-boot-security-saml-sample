@@ -1,6 +1,9 @@
 package com.vdenotaris.spring.boot.security.saml.web.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +16,9 @@ import javax.persistence.Id;
  */
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SamlConfig {
     @Id
     @Column(columnDefinition = "varchar(64) COMMENT '主键ID'")

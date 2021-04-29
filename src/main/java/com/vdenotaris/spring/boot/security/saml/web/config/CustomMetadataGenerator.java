@@ -83,7 +83,7 @@ public class CustomMetadataGenerator extends MetadataGenerator {
         return descriptor;
     }
 
-
+    @SuppressWarnings("unchecked")
     public SingleSignOnService getSingleSignOnService(String url, String binding) {
         SAMLObjectBuilder<SingleSignOnService> builder = (SAMLObjectBuilder<SingleSignOnService>) builderFactory.getBuilder(SingleSignOnService.DEFAULT_ELEMENT_NAME);
         SingleSignOnService consumer = builder.buildObject();
@@ -94,7 +94,7 @@ public class CustomMetadataGenerator extends MetadataGenerator {
         return consumer;
     }
 
-
+    @SuppressWarnings("unchecked")
     public EntityDescriptor generateSPMetadata(SPConfig spConfig) {
         SAMLObjectBuilder<EntityDescriptor> builder = (SAMLObjectBuilder<EntityDescriptor>) builderFactory.getBuilder(EntityDescriptor.DEFAULT_ELEMENT_NAME);
         EntityDescriptor descriptor = builder.buildObject();
