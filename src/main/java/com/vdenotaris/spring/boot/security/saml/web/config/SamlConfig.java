@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * @author hongen.zhang
@@ -19,6 +17,10 @@ import javax.persistence.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "uk_company_id", columnList = "companyId", unique = true)
+
+})
 public class SamlConfig {
     @Id
     @Column(columnDefinition = "varchar(64) COMMENT '主键ID'")

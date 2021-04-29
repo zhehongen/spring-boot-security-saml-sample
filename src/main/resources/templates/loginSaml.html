@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>Sign in</title>
+    <meta name="description" content="统一认证授权中心"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+          href="../static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" th:href="@{/css/login.css}"
+          href="../static/css/login.css">
+    <style>
+        .login-content {
+            max-width: 532px;
+            min-width: 298px;
+        }
+
+        .from-content {
+            margin: 0;
+            display: flex;
+        }
+
+        .form-input {
+            padding: 8px;
+        }
+
+        .btn-submit {
+            margin: 40px 0 27px;
+        }
+
+        .register-content {
+            margin-bottom: 48px;
+        }
+
+        .form-right {
+            width: 113px;
+            height: 32px;
+            padding: 7px 8px;
+            background: #F5F7F9;
+            box-shadow: inset 0px -1px 0px #CED2D9, inset 0px 1px 0px #CED2D9, inset -1px 1px 0px #CED2D9;
+            border-radius: 0px 2px 2px 0px;
+            border: none;
+            color: #979CA8;
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .login-content {
+                width: 78%;
+            }
+        }
+
+        @media screen and (max-height: 567px) and (min-width: 569px) {
+            .login-content {
+                min-height: inherit;
+                position: relative;
+            }
+        }
+
+        @media screen and (max-width: 374px) {
+            .login-logo h1 {
+                font-size: 18px;
+                padding: 40px 0 20px;
+            }
+
+            .Copyright {
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="login-wrapper">
+    <div class="logo-wrapper">
+        <img src="./images/logo.png" width="333px" height="30px" alt="logo"/>
+        <p class="company-desc">
+            All in One solution. Build your successful business with one single
+            platform.
+        </p>
+    </div>
+    <div class="login-content">
+        <div class="login-logo">
+            <h1>Sign In with SAML SSO</h1>
+        </div>
+        <div class="login-form">
+            <form id="form-user" onsubmit="return false" method="post">
+                <div class="from-content">
+                    <input type="text" class="form-input" name="domain" placeholder="Company Domain" id="domain"
+                           onblur="domainHandleBlur()"/>
+                    <button class="form-right">.thingsmatrix.io</button>
+                </div>
+                <p id="domainMsg" style="
+          display: none;
+          color: red;
+          font-size: 12px;
+          text-align: left;
+          margin-top: 0.5rem;
+          margin-bottom: 0;
+        ">
+                    错误提示语
+                </p>
+                <button class="btn-submit" onclick="severCheck(this)">Continue</button>
+            </form>
+            <div class="register-content">
+                <p>
+                    <a style="cursor: pointer;" th:href="${loginLink}">back</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="Copyright">Copyright © 2021 ThingsMatrix Inc. All Rights Reserved.</div>
+</div>
+</body>
+<script th:src="@{/js/jquery-2.2.4.min.js}" src="../static/js/jquery-2.2.4.min.js"></script>
+<script>
+    function domainHandleBlur() {
+        const domainPatten = /^[a-zA-Z\d-]{2,20}$/
+        const val = $("#domain").val();
+        console.log('domain', domainPatten.test(val))
+        const match = domainPatten.test(val)
+        if (val == '') {
+            $("#domainMsg").text('Domain is required')
+            $("#domainMsg").show();
+            return false
+        } else if (!match) {
+            $("#domainMsg").text('Incorrect format')
+            $("#domainMsg").show();
+            return false
+        }
+        $("#domainMsg").hide();
+        return true;
+    }
+
+    function severCheck(e) {
+        if (domainHandleBlur()) {
+            $(e).attr("disabled", "disabled");
+            const form = document.getElementById("form-user");
+            form.submit();
+        }
+    }
+</script>
+
+</html>

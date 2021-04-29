@@ -1,0 +1,405 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+  height: 100vh;
+  background-image: url('../images/sign_logo.svg'),
+                    url('../images/sign_bg.svg');
+  background-repeat: no-repeat,no-repeat;
+  background-size: contain,cover;
+  background-position: right 0 bottom 0,0;
+}
+.error-message {
+  width: 100%;
+  position: absolute;
+  top: 30px;
+  text-align: center;
+  padding: 0 20px;
+  border-radius: 2px;
+}
+.error-style {
+  background: #fff;
+  display: inline-block;
+  height: 100%;
+  padding: 24px;
+  color: #17233D;
+  border: 1px solid #E1E5EB;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05), 0px 6px 12px 4px rgba(0, 0, 0, 0.03);
+  display: none;
+}
+.error-style::before {
+  content: '!';
+  display: inline-block;
+  width: 14px;
+	height: 14px;
+	line-height: 14px;
+	background-color: #FF4D4F;
+	border-radius: 50%;
+  font-size: 12px;
+  margin-right: 12px;
+	color: white;
+	text-align: center;
+	cursor: default;
+  position: relative;
+  top: -2px;
+}
+  .login-wrapper {
+    width: 78%;
+    min-width: 663px;
+    max-width: 1112px;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto;
+  }
+
+.login-content {
+    max-width: 500px;
+    width: 48%;
+    min-width: 258px;
+    padding: 0px 24px 0 24px;
+    /* height: 472px; */
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.logo-wrapper {
+    flex: 1;
+    max-width: 440px;
+}
+
+.company-desc {
+    font-size: 22px;
+    font-family: Roboto-Medium, Roboto;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 32px;
+    padding-top: 40px;
+}
+
+.login-logo h1 {
+    font-size: 24px;
+    font-family: Roboto-Medium, Roboto;
+    font-weight: 500;
+    color: #17233d;
+    padding-top: 80px;
+    padding-bottom: 40px;
+}
+
+.login-form {
+    max-width: 372px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.from-content {
+    position: relative;
+    margin: 0 0 20px;
+}
+
+/* .form-pass {
+      margin: 0 24px;
+  } */
+
+.input-prefix {
+    position: absolute;
+    left: 9px;
+    top: 10px;
+}
+
+.input-suffix {
+    position: absolute;
+    right: 9px;
+    top: 10px;
+}
+
+.form-input {
+    /* width: 372px; */
+    width: 100%;
+    height: 32px;
+    background: #ffffff;
+    border-radius: 2px;
+    border: 1px solid #ced2d9;
+    padding: 8px 30px;
+    font-size: 14px;
+}
+
+.password-content {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px 0px 0;
+}
+
+.btn-submit {
+    /* width: 372px; */
+    height: 32px;
+    width: 100%;
+    background: #0a8bf5;
+    border-radius: 2px;
+    border: none;
+    font-weight: 400;
+    color: #ffffff;
+    margin: 30px 0;
+}
+
+a {
+    color: #0a8bf5 !important;
+}
+
+a:hover {
+    color: #0a8bf5 !important;
+    text-decoration: none;
+}
+
+.register-content {
+    font-size: 14px;
+    /* padding-top: 40px; */
+}
+
+.form-input:focus,
+select:focus {
+    border-radius: 2px;
+    border: 1px solid #1890ff;
+    outline: none;
+}
+
+.error:focus,
+select:focus {
+    border-radius: 2px;
+    border: 1px solid red;
+    outline: none;
+}
+
+.btn-pointer {
+    cursor: pointer;
+}
+
+.register-content {
+    margin-bottom: 68px;
+}
+
+.Copyright {
+    content: 'Copyright © 2021 ThingsMatrix Inc. All Rights Reserved.';
+    color: #ffffff;
+    font-size: 12px;
+    position: absolute;
+    bottom: 50px;
+    text-align: center;
+    width: 100%;
+    left: 0;
+}
+
+/* 横屏样式 */
+@media screen and (max-width: 896px) {
+    .Copyright {
+        position: absolute;
+        bottom: 40px;
+    }
+
+    .login-logo h1 {
+        padding-top: 40px;
+        padding-bottom: 20px;
+        font-size: 21px;
+    }
+
+    .btn-submit {
+        margin: 24px 0;
+
+    }
+
+    .register-content {
+        margin-bottom: 68px;
+    }
+
+    .logo-wrapper {
+        max-width: 281px;
+    }
+
+    .logo-wrapper img {
+        width: 246px !important;
+        height: auto;
+    }
+
+    .company-desc {
+        font-size: 14px;
+        padding-top: 17px;
+        line-height: 16px;
+    }
+
+    .password-content {
+        padding-top: 6px;
+    }
+}
+
+@media screen and (max-width: 760px) {
+    .login-logo h1 {
+        padding-top: 40px;
+        padding-bottom: 20px;
+        font-size: 20px;
+    }
+}
+
+/* 手机样式 */
+@media screen and (max-width: 600px) {
+    body {
+        background: url('../images/Rectangle_2x.png') no-repeat;
+        background-size: 100% 100%;
+    }
+
+    .login-wrapper {
+        max-height: 100%;
+        overflow: auto;
+        flex-flow: column;
+        min-width: 0;
+        height: initial;
+        width: auto;
+        padding: 77px 0;
+        text-align: center;
+    }
+
+    .logo-wrapper {
+        margin-bottom: 23px;
+
+    }
+
+    .login-content {
+        width: auto;
+        max-width: 330px;
+    }
+
+    .login-logo h1 {
+        font-size: 21px;
+    }
+
+    .login-content {
+        width: 85%;
+    }
+
+    .from-content {
+        margin-bottom: 16px;
+    }
+    .error-style {
+      font-size: 12px;
+      padding: 12px
+    }
+
+}
+
+/* iphone5样式 */
+@media screen and (max-width: 374px) {
+    .login-logo h1 {
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+
+    .register-content {
+        margin-bottom: 20px;
+    }
+
+    .btn-submit {
+        margin: 12px 0;
+    }
+
+    .password-content {
+        padding-top: 0;
+    }
+
+    .login-content::after {
+        bottom: 32x;
+        padding: 0 12px;
+    }
+
+    .login-wrapper {
+        padding-top: 48px;
+        flex-wrap: wrap;
+    }
+    .error-style {
+      font-size: 12px;
+      padding: 12px;
+    }
+}
+/* ipad样式*/
+@media screen and (min-width: 600.1px) and (max-width: 812px) {
+    body {
+        background: url('../images/Rectangle_ipad2x.png') no-repeat;
+        background-size: 100% 100%;
+    }
+
+    .login-wrapper {
+        min-width: 578px;
+        flex-wrap: wrap;
+    }
+}
+
+
+/* 设置最小高度滚动 */
+
+@media screen and (max-height: 567px) and (min-width: 569px) {
+    body {
+        overflow: hidden;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        padding: 40px 40px;
+        overflow: auto;
+        align-items: flex-start;
+    }
+
+    .scrollbar {
+        width: 30px;
+        height: 300px;
+        margin: 0 auto;
+    }
+    .login-wrapper::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 6px;
+        /*高宽分别对应横竖滚动条的尺寸*/
+        height: 1px;
+    }
+
+    .login-wrapper::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        width: 6px;
+        height: 6px;
+        background: #CED2D9;
+        border-radius: 3px;
+        opacity: 0.8;
+    }
+
+    .login-wrapper::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        /* box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 10px; */
+        background: none;
+    }
+
+    .login-content {
+        min-height: 366px;
+        position: relative;
+    }
+
+    .logo-wrapper {
+        align-self: center;
+    }
+
+    .login-content::after {
+        bottom: -50px;
+    }
+}
+
+@media screen and (max-height: 567px) {
+    .Copyright {
+        position: relative;
+        bottom: -30px;
+    }
+}

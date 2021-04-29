@@ -556,5 +556,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
             "/channel/**",
             "/oauth/token",
             "/oauth/listen",
+            "/samllogin",
+            "/images/**"
     };
 }
